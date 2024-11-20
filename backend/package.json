@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
- "scripts": {
+  "scripts": {
     "dev": "nodemon -r dotenv/config --legacy-watch src/index.ts"
   },
   "keywords": [],
@@ -20,6 +20,7 @@
     "mongoose-aggregate-paginate-v2": "^1.1.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

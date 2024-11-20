@@ -1,11 +1,43 @@
 import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "./components/mode-toggle";
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Layout from "./Layout";
+import HomePage from "@/pages/HomePage";
+import SignUpPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Protected Routes */}
+      <Route
+        index
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+    </Route>
+  )
+);
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <ModeToggle />
-      <h1 className="text-3xl text-center font-bold">Hello world</h1>
+      <Toaster richColors />
+      <RouterProvider router={router}></RouterProvider>
     </ThemeProvider>
   );
 }
