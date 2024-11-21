@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,6 +24,7 @@ import {
 import PasswordInput from "@/components/PasswordInput";
 import { toast } from "sonner";
 import { fetchLogin } from "@/features/UserSlice";
+import { useEffect } from "react";
 
 const loginFormSchema = z.object({
   email: z.string().email(),
@@ -35,6 +36,14 @@ function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [userInfo, navigate]);
+
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -42,6 +51,7 @@ function LoginPage() {
       password: "",
     },
   });
+
   function onSubmit(values: z.infer<typeof loginFormSchema>) {
     const loginUserPromise = dispatch(fetchLogin(values)).unwrap();
     toast.promise(loginUserPromise, {

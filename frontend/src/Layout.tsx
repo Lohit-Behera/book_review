@@ -23,10 +23,10 @@ function Layout() {
         <p>Loading...</p>
       ) : userDetailsStatus === "failed" ? (
         <p>Error</p>
-      ) : userDetailsStatus === "succeeded" ? (
+      ) : userDetailsStatus === "succeeded" || userDetailsStatus === "idle" ? (
         <>
           <Header />
-          <main className="flex-1 flex justify-center items-center">
+          <main className="flex-1 flex justify-center items-center my-6">
             <ScrollRestoration />
             <Outlet />
           </main>

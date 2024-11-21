@@ -1,8 +1,58 @@
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useEffect } from "react";
+import { fetchGetAllBooks } from "@/features/BookSlice";
+
 function HomePage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const books = useSelector((state: RootState) => state.book.getAllBooks).data
+    .docs;
+  const getAllBooksStatus = useSelector(
+    (state: RootState) => state.book.getAllBooksStatus
+  );
+  useEffect(() => {
+    dispatch(fetchGetAllBooks());
+  }, []);
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Home Page</h1>
-    </div>
+    <>
+      {getAllBooksStatus === "loading" ? (
+        <p>Loading...</p>
+      ) : getAllBooksStatus === "failed" ? (
+        <p>Error</p>
+      ) : getAllBooksStatus === "succeeded" ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {books?.map((book) => (
+            <Card>
+              <CardHeader>
+                <Link to={`/book/${book?._id}`}>
+                  <CardTitle className="hover:underline">
+                    {book?.title}
+                  </CardTitle>
+                </Link>
+                <CardDescription>Author {book?.author}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs md:text-sm line-clamp-3">
+                  {book?.description}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <p>Rating {book?.rating}</p>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : null}
+    </>
   );
 }
 

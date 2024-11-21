@@ -11,8 +11,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Layout from "./Layout";
 import HomePage from "@/pages/HomePage";
-import SignUpPage from "./pages/SignUpPage";
-import LoginPage from "./pages/LoginPage";
+import SignUpPage from "@/pages/SignUpPage";
+import LoginPage from "@/pages/LoginPage";
+import CreateBookPage from "@/pages/CreateBookPage";
+import BookPage from "./pages/BookPage";
+import AdminRoute from "./components/AdminRoute";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,15 +32,48 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/book/:bookId"
+        element={
+          <ProtectedRoute>
+            <BookPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Routes */}
+
+      <Route
+        path="/create"
+        element={
+          <AdminRoute>
+            <CreateBookPage />
+          </AdminRoute>
+        }
+      />
     </Route>
-  )
+  ),
+  {
+    future: {
+      v7_relativeSplatPath: true,
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_skipActionErrorRevalidation: true,
+    },
+  }
 );
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Toaster richColors />
-      <RouterProvider router={router}></RouterProvider>
+      <RouterProvider
+        future={{
+          v7_startTransition: true,
+        }}
+        router={router}
+      ></RouterProvider>
     </ThemeProvider>
   );
 }

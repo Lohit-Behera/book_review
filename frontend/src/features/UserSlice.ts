@@ -3,6 +3,15 @@ import axios from "axios";
 import { baseUrl } from "@/lib/proxy";
 import { getCookie } from "@/lib/getCookie";
 
+type UserDetails = {
+  _id: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const fetchRegister = createAsyncThunk(
   "user/register",
   async (
@@ -76,9 +85,8 @@ export const fetchLogout = createAsyncThunk(
         },
         withCredentials: true,
       };
-      const { data } = await axios.post(
+      const { data } = await axios.get(
         `${baseUrl}/api/v1/users/logout`,
-        {},
         config
       );
       document.cookie =
@@ -133,7 +141,7 @@ const userSlice = createSlice({
     logoutStatus: "idle",
     logoutError: {},
 
-    userDetails: {},
+    userDetails: { data: {} as UserDetails },
     userDetailsStatus: "idle",
     userDetailsError: {},
   },
