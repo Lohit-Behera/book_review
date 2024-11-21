@@ -3,12 +3,12 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const reviewSchema = new Schema(
   {
-    bookId: {
+    book: {
       type: Schema.Types.ObjectId,
       ref: "Book",
       required: true,
     },
-    userId: {
+    user: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

@@ -29,16 +29,18 @@ function HomePage() {
       ) : getAllBooksStatus === "failed" ? (
         <p>Error</p>
       ) : getAllBooksStatus === "succeeded" ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full md:w-[95%] lg:w-[90%]">
           {books?.map((book) => (
             <Card>
               <CardHeader>
                 <Link to={`/book/${book?._id}`}>
-                  <CardTitle className="hover:underline">
+                  <CardTitle className="text-lg md:text-xl hover:underline">
                     {book?.title}
                   </CardTitle>
                 </Link>
-                <CardDescription>Author {book?.author}</CardDescription>
+                <CardDescription className="text-xs md:text-sm">
+                  Author {book?.author}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-xs md:text-sm line-clamp-3">

@@ -8,6 +8,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 import Layout from "./Layout";
 import HomePage from "@/pages/HomePage";
@@ -15,7 +16,7 @@ import SignUpPage from "@/pages/SignUpPage";
 import LoginPage from "@/pages/LoginPage";
 import CreateBookPage from "@/pages/CreateBookPage";
 import BookPage from "./pages/BookPage";
-import AdminRoute from "./components/AdminRoute";
+import ProfilePage from "./pages/ProfilePage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,6 +38,14 @@ const router = createBrowserRouter(
         element={
           <ProtectedRoute>
             <BookPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/:userId"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />
