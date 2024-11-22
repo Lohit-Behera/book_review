@@ -13,7 +13,7 @@ function RatingStar({
   text?: boolean;
 }) {
   return (
-    <div className={cn("flex drop-shadow-md text-primary", className)}>
+    <div className={cn("flex drop-shadow-md text-amber-400", className)}>
       <span className="mx-[0.1rem] ">
         {value >= 1 ? (
           <Star fill="currentColor" />

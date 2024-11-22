@@ -23,11 +23,11 @@ const createBook = asyncHandler(async (req, res) => {
       .status(400)
       .json(new ApiResponse(400, null, "Please provide at least one genre."));
   }
-  if (title.length < 3) {
+  if (title.length < 1) {
     return res
       .status(400)
       .json(
-        new ApiResponse(400, null, "Title must be at least 3 characters long.")
+        new ApiResponse(400, null, "Title must be at least 1 characters long.")
       );
   }
   if (author.length < 3) {
@@ -86,7 +86,29 @@ const getBook = asyncHandler(async (req, res) => {
   const book = await Book.aggregate([
     {
       $match: {
-        _id: mongoose.Types.ObjectId.createFromHexString(bookId),
+        _id: new mongoose.Types.ObjectId(bookId),
+      },
+    },
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "_id",
+        foreignField: "book",
+        as: "reviews",
+      },
+    },
+    {
+      $addFields: {
+        averageRating: {
+          $cond: {
+            if: { $gt: [{ $size: "$reviews" }, 0] },
+            then: { $avg: "$reviews.rating" },
+            else: null,
+          },
+        },
+        totalReview: {
+          $size: "$reviews",
+        },
       },
     },
     {
@@ -109,7 +131,8 @@ const getBook = asyncHandler(async (req, res) => {
         author: 1,
         genre: 1,
         description: 1,
-        rating: 1,
+        averageRating: 1,
+        totalReview: 1,
         createdAt: 1,
         updatedAt: 1,
         createdBy: "$user.name",
@@ -125,7 +148,30 @@ const getBook = asyncHandler(async (req, res) => {
 });
 
 const getAllBooks = asyncHandler(async (req, res) => {
-  const aggregate = Book.aggregate([
+  const { page = 1, limit = 12, sort = "desc", sortBy = "desc" } = req.query;
+
+  // Building the aggregation pipeline
+  const pipeline: any[] = [
+    {
+      $lookup: {
+        from: "reviews",
+        localField: "_id",
+        foreignField: "book",
+        as: "reviews",
+      },
+    },
+    {
+      $addFields: {
+        averageRating: {
+          $cond: {
+            if: { $gt: [{ $size: "$reviews" }, 0] },
+            then: { $avg: "$reviews.rating" },
+            else: null,
+          },
+        },
+        totalReview: { $size: "$reviews" },
+      },
+    },
     {
       $lookup: {
         from: "users",
@@ -135,9 +181,7 @@ const getAllBooks = asyncHandler(async (req, res) => {
       },
     },
     {
-      $unwind: {
-        path: "$user",
-      },
+      $unwind: { path: "$user" },
     },
     {
       $project: {
@@ -146,25 +190,37 @@ const getAllBooks = asyncHandler(async (req, res) => {
         author: 1,
         genre: 1,
         description: 1,
-        rating: 1,
+        averageRating: 1,
+        totalReview: 1,
         createdAt: 1,
         updatedAt: 1,
         createdBy: "$user.name",
       },
     },
-  ]);
+  ];
 
-  const books = await Book.aggregatePaginate(aggregate, {
-    page: Number(req.query.page) || 1,
-    limit: Number(req.query.limit) || 12,
-    sort: {
-      createdAt: -1,
-    },
-  });
+  // Sorting by createdAt
+  if (sortBy === "reviews") {
+    pipeline.push({
+      $sort: { totalReview: sort === "asc" ? 1 : -1 }, // Sort by total reviews
+    });
+  } else {
+    pipeline.push({
+      $sort: { createdAt: sort === "asc" ? 1 : -1 }, // Default to createdAt if not sorting by reviews
+    });
+  }
+  // Pagination
+  const options = {
+    page: Number(page),
+    limit: Number(limit),
+  };
+
+  const books = await Book.aggregatePaginate(Book.aggregate(pipeline), options);
 
   if (books.docs.length === 0) {
     return res.status(200).json(new ApiResponse(200, null, "No books found."));
   }
+
   return res
     .status(200)
     .json(new ApiResponse(200, books, "Books found successfully."));

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { StarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { fetchCreateReview, fetchGetReviews } from "@/features/ReviewSlice";
+import { Badge } from "@/components/ui/badge";
 
 function BookPage() {
   const { bookId } = useParams();
@@ -86,8 +87,26 @@ function BookPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
+        <div className="grid gap-4">
+          <p className="text-sm md:text-base font-semibold">Genre</p>
+          <div className="flex gap-2">
+            {book?.genre.map((i) => (
+              <Badge
+                key={i}
+                className="hover:cursor-default"
+                variant="secondary"
+              >
+                {i}
+              </Badge>
+            ))}
+          </div>
+        </div>
         <p className="text-sm md:text-base">{book?.description}</p>
-        <RatingStar value={book?.rating} reviews={5} text />
+        <RatingStar
+          value={book?.averageRating}
+          reviews={book?.totalReview}
+          text
+        />
       </CardContent>
       <CardFooter className="grid gap-4">
         <div className="grid gap-2">

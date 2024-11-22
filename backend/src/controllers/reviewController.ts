@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
+import mongoose from "mongoose";
 import { Book } from "../models/bookModel";
 import { User } from "../models/userModel";
 import { Review } from "../models/reviewModel";
@@ -67,6 +68,11 @@ const getReviews = asyncHandler(async (req, res) => {
   const { bookId } = req.params;
   // get reviews
   const aggregate = Review.aggregate([
+    {
+      $match: {
+        book: new mongoose.Types.ObjectId(bookId),
+      },
+    },
     {
       $lookup: {
         from: "users",

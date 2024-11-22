@@ -9,7 +9,8 @@ type GetBook = {
   genre: string[];
   description: string;
   createdBy: string;
-  rating: number;
+  averageRating: number;
+  totalReview: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -89,7 +90,14 @@ export const fetchGetBook = createAsyncThunk(
 
 export const fetchGetAllBooks = createAsyncThunk(
   "book/getAll",
-  async (_, { rejectWithValue }) => {
+  async (
+    {
+      sortBy,
+      page,
+      author,
+    }: { sortBy?: string; page?: number; author?: string },
+    { rejectWithValue }
+  ) => {
     try {
       const config = {
         headers: {
@@ -97,7 +105,10 @@ export const fetchGetAllBooks = createAsyncThunk(
         },
         withCredentials: true,
       };
-      const { data } = await axios.get(`${baseUrl}/api/v1/books/all`, config);
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/books/all?sortBy=${sortBy}&page=${page}&author=${author}`,
+        config
+      );
       return data;
     } catch (error: any) {
       const errorMessage =

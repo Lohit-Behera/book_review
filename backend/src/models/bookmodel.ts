@@ -19,10 +19,6 @@ const bookSchema = new Schema(
       type: String,
       required: true,
     },
-    rating: {
-      type: Number,
-      default: 0,
-    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",

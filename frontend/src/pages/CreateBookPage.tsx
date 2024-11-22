@@ -31,8 +31,8 @@ import { toast } from "sonner";
 const createBookSchema = z.object({
   title: z
     .string()
-    .min(5, {
-      message: "Title must be at least 5 characters",
+    .min(1, {
+      message: "Title must be at least 1 characters",
     })
     .max(50, {
       message: "Title must be less than 50 characters",
@@ -172,6 +172,12 @@ function CreateBookPage() {
                           onChange={(e) => {
                             e.preventDefault();
                             setNewGenre(e.target.value);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addGenre();
+                            }
                           }}
                         />
                         <Button
