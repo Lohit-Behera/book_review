@@ -62,6 +62,9 @@ function BookPage() {
       toast.promise(createReviewPromise, {
         loading: "Creating review...",
         success: (data: any) => {
+          dispatch(fetchGetReviews(bookId));
+          setReview("");
+          setRating(0);
           return data.message;
         },
         error: "Error creating review.",
