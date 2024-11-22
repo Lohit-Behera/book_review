@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ServerErrorPage from "./Error/ServerErrorPage";
+import HomeLoader from "@/components/Loader/HomeLoader";
 
 function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -49,9 +51,9 @@ function HomePage() {
   return (
     <>
       {getAllBooksStatus === "loading" ? (
-        <p>Loading...</p>
+        <HomeLoader />
       ) : getAllBooksStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : getAllBooksStatus === "succeeded" ? (
         <>
           {booksList?.length === 0 ? (
@@ -64,12 +66,12 @@ function HomePage() {
                   onValueChange={handleSortChange}
                 >
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort" />
+                    <SelectValue placeholder="Sort" defaultValue={"reviews"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="reviews">Highest Reviews</SelectItem>
-                    <SelectItem value="date-desc">Newest First</SelectItem>
-                    <SelectItem value="date-asc">Oldest First</SelectItem>
+                    <SelectItem value="desc">Newest First</SelectItem>
+                    <SelectItem value="asc">Oldest First</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

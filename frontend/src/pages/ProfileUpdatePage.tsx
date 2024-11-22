@@ -24,11 +24,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
+  fetchMakeAdmin,
   fetchUpdatePassword,
+  fetchUpdateProfile,
   fetchUserInfoProfile,
 } from "@/features/UserSlice";
 import PasswordInput from "@/components/PasswordInput";
 import { toast } from "sonner";
+import ServerErrorPage from "./Error/ServerErrorPage";
+import GlobalLoader from "@/components/GlobalLoader/GlobalLoader";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z
@@ -61,7 +66,9 @@ const passwordSchema = z
 function ProfileUpdatePage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const userDetails = useSelector((state: RootState) => state.user.userDetails);
+  const userDetails = useSelector(
+    (state: RootState) => state.user.userDetails
+  ).data;
 
   const userInfoProfile = useSelector(
     (state: RootState) => state.user.userInfoProfile
@@ -69,10 +76,13 @@ function ProfileUpdatePage() {
   const userInfoProfileStatus = useSelector(
     (state: RootState) => state.user.userInfoProfileStatus
   );
+  const makeAdminStatus = useSelector(
+    (state: RootState) => state.user.makeAdminStatus
+  );
 
   useEffect(() => {
-    dispatch(fetchUserInfoProfile(userDetails.data._id));
-  }, [dispatch, userDetails.data._id]);
+    dispatch(fetchUserInfoProfile(userDetails._id));
+  }, [dispatch, userDetails._id]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,7 +108,20 @@ function ProfileUpdatePage() {
     ) {
       toast.warning("No changes made");
     } else {
-      console.log(values);
+      const updateProfilePromise = dispatch(
+        fetchUpdateProfile(values)
+      ).unwrap();
+
+      toast.promise(updateProfilePromise, {
+        loading: "Updating profile...",
+        success: (data) => {
+          dispatch(fetchUserInfoProfile(userDetails._id));
+          return data.message || "Profile updated successfully.";
+        },
+        error: (error) => {
+          return error || error.message || "Error updating profile.";
+        },
+      });
     }
   }
 
@@ -118,6 +141,7 @@ function ProfileUpdatePage() {
     toast.promise(updatePasswordPromise, {
       loading: "Updating password...",
       success: (data) => {
+        dispatch(fetchUserInfoProfile(userDetails._id));
         return data.message || "Password updated successfully.";
       },
       error: (error) => {
@@ -126,19 +150,45 @@ function ProfileUpdatePage() {
     });
   }
 
+  const handleAdmin = () => {
+    const adminPromise = dispatch(fetchMakeAdmin()).unwrap();
+    toast.promise(adminPromise, {
+      loading: "Making admin...",
+      success: (data) => {
+        dispatch(fetchUserInfoProfile(userDetails._id));
+        return data.message || "Admin made successfully.";
+      },
+      error: (error) => {
+        return error || error.message || "Error making admin.";
+      },
+    });
+  };
+
   return (
     <>
       {userInfoProfileStatus === "loading" ? (
-        <p>Loading...</p>
+        <GlobalLoader />
       ) : userInfoProfileStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : userInfoProfileStatus === "succeeded" ? (
         <Card className="w-full md:w-[90%] lg:w-[80%]">
           <CardHeader>
             <CardTitle>Update Profile</CardTitle>
             <CardDescription>Card Description</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-4">
+              <p>This is for testing purposes make yourself Admin</p>
+              <Button size="sm" onClick={handleAdmin}>
+                {makeAdminStatus === "loading" ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : userInfoProfile.data.isAdmin ? (
+                  "Remove Admin"
+                ) : (
+                  "Make Admin"
+                )}
+              </Button>
+            </div>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmitForm)}

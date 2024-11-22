@@ -218,45 +218,13 @@ const userDetails = asyncHandler(async (req, res) => {
 
 const getUserInfo = asyncHandler(async (req, res) => {
   const userId = req.params.userId;
-  const user = await Review.aggregate([
-    {
-      $match: {
-        user: new mongoose.Types.ObjectId(userId),
-      },
-    },
-    {
-      $group: {
-        _id: "$user",
-        totalReviews: { $sum: 1 },
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "_id",
-        foreignField: "_id",
-        as: "userDetails",
-      },
-    },
-    {
-      $unwind: "$userDetails",
-    },
-    {
-      $project: {
-        _id: 0,
-        userId: "$_id",
-        name: "$userDetails.name",
-        email: "$userDetails.email",
-        isAdmin: "$userDetails.isAdmin",
-        totalReviews: 1,
-      },
-    },
-  ]);
+  const user = await User.find({ _id: userId }).select(
+    "_id name email isAdmin"
+  );
 
   if (!user) {
     return res.status(404).json(new ApiResponse(404, null, "User not found."));
   }
-
   return res
     .status(200)
     .json(new ApiResponse(200, user[0], "User found successfully."));
@@ -279,6 +247,11 @@ const userUpdate = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
   }
   if (user?.email !== email && user) {
+    if (await User.findOne({ email })) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Email already exists."));
+    }
     user.email = email;
     await user.save({ validateBeforeSave: false });
   }
@@ -321,6 +294,26 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
+const makeUserAdmin = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found."));
+  }
+  if (user.isAdmin) {
+    user.isAdmin = false;
+    await user.save({ validateBeforeSave: false });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, `${user.name} is now not an admin.`));
+  } else {
+    user.isAdmin = true;
+    await user.save({ validateBeforeSave: false });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, `${user.name} is now an admin.`));
+  }
+});
+
 export {
   userRegister,
   userLogin,
@@ -329,4 +322,5 @@ export {
   getUserInfo,
   userUpdate,
   updatePassword,
+  makeUserAdmin,
 };

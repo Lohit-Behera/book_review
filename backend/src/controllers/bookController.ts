@@ -148,7 +148,7 @@ const getBook = asyncHandler(async (req, res) => {
 });
 
 const getAllBooks = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 12, sort = "desc", sortBy = "desc" } = req.query;
+  const { page = 1, limit = 12, sortBy = "desc" } = req.query;
 
   // Building the aggregation pipeline
   const pipeline: any[] = [
@@ -202,11 +202,11 @@ const getAllBooks = asyncHandler(async (req, res) => {
   // Sorting by createdAt
   if (sortBy === "reviews") {
     pipeline.push({
-      $sort: { totalReview: sort === "asc" ? 1 : -1 }, // Sort by total reviews
+      $sort: { totalReview: -1 },
     });
   } else {
     pipeline.push({
-      $sort: { createdAt: sort === "asc" ? 1 : -1 }, // Default to createdAt if not sorting by reviews
+      $sort: { createdAt: sortBy === "asc" ? 1 : -1 },
     });
   }
   // Pagination

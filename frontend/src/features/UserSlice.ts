@@ -13,8 +13,7 @@ type UserDetails = {
 };
 
 type UserInfoProfile = {
-  totalReviews: number;
-  userId: string;
+  _id: string;
   name: string;
   email: string;
   isAdmin: boolean;
@@ -216,6 +215,32 @@ export const fetchUpdatePassword = createAsyncThunk(
   }
 );
 
+export const fetchMakeAdmin = createAsyncThunk(
+  "user/makeAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/admin`,
+        {},
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const userInfoCookie = getCookie("userInfoBookReview");
 
 const userSlice = createSlice({
@@ -236,8 +261,23 @@ const userSlice = createSlice({
     userInfoProfile: { data: {} as UserInfoProfile },
     userInfoProfileStatus: "idle",
     userInfoProfileError: {},
+
+    makeAdmin: {},
+    makeAdminStatus: "idle",
+    makeAdminError: {},
   },
-  reducers: {},
+  reducers: {
+    resetUserDetails: (state) => {
+      state.userDetails = { data: {} as UserDetails };
+      state.userDetailsStatus = "idle";
+      state.userDetailsError = {};
+    },
+    reSignIn: (state) => {
+      state.userInfo = null;
+      document.cookie =
+        "userInfoBookReview=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Login
@@ -292,8 +332,22 @@ const userSlice = createSlice({
         state.userInfoProfileStatus = "failed";
         state.userInfoProfileError =
           action.payload || "User Info Profile failed";
+      })
+
+      // Make Admin
+      .addCase(fetchMakeAdmin.pending, (state) => {
+        state.makeAdminStatus = "loading";
+      })
+      .addCase(fetchMakeAdmin.fulfilled, (state, action) => {
+        state.makeAdminStatus = "succeeded";
+        state.makeAdmin = action.payload;
+      })
+      .addCase(fetchMakeAdmin.rejected, (state, action) => {
+        state.makeAdminStatus = "failed";
+        state.makeAdminError = action.payload || "Make Admin failed";
       });
   },
 });
 
+export const { reSignIn, resetUserDetails } = userSlice.actions;
 export default userSlice.reducer;

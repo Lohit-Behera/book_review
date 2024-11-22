@@ -18,13 +18,16 @@ import CreateBookPage from "@/pages/CreateBookPage";
 import BookPage from "./pages/BookPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProfileUpdatePage from "./pages/ProfileUpdatePage";
+import ContactUsPage from "./pages/ContactUsPage";
+import PageNotFound from "./pages/Error/PageNotFound";
 
-// TODO feature books
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
+      <Route path="*" element={<PageNotFound />} />
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/contact" element={<ContactUsPage />} />
 
       {/* Protected Routes */}
       <Route

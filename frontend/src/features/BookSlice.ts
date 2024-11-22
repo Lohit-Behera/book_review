@@ -91,11 +91,7 @@ export const fetchGetBook = createAsyncThunk(
 export const fetchGetAllBooks = createAsyncThunk(
   "book/getAll",
   async (
-    {
-      sortBy,
-      page,
-      author,
-    }: { sortBy?: string; page?: number; author?: string },
+    { sortBy, page }: { sortBy?: string; page?: number },
     { rejectWithValue }
   ) => {
     try {
@@ -106,7 +102,7 @@ export const fetchGetAllBooks = createAsyncThunk(
         withCredentials: true,
       };
       const { data } = await axios.get(
-        `${baseUrl}/api/v1/books/all?sortBy=${sortBy}&page=${page}&author=${author}`,
+        `${baseUrl}/api/v1/books/all?sortBy=${sortBy}&page=${page}`,
         config
       );
       return data;

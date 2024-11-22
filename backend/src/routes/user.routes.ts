@@ -8,6 +8,7 @@ import {
   getUserInfo,
   userUpdate,
   updatePassword,
+  makeUserAdmin,
 } from "../controllers/userController";
 
 const router = Router();
@@ -22,5 +23,6 @@ router.get("/details", authMiddleware, userDetails);
 router.get("/profile/:userId", authMiddleware, getUserInfo);
 router.patch("/update", authMiddleware, userUpdate);
 router.patch("/update/password", authMiddleware, updatePassword);
+router.patch("/admin", authMiddleware, makeUserAdmin);
 
 export default router;

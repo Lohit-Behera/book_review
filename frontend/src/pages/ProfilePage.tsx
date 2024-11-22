@@ -11,17 +11,17 @@ import {
 import { useEffect } from "react";
 import { fetchLogout, fetchUserInfoProfile } from "@/features/UserSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import ServerErrorPage from "./Error/ServerErrorPage";
+import GlobalLoader from "@/components/GlobalLoader/GlobalLoader";
 
 function ProfilePage() {
   const { userId } = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const userInfoProfile = useSelector(
-    (state: RootState) => state.user.userInfoProfile
-  ).data;
+  const userInfoProfile =
+    useSelector((state: RootState) => state.user.userInfoProfile).data || {};
   const userInfoProfileStatus = useSelector(
     (state: RootState) => state.user.userInfoProfileStatus
   );
@@ -35,9 +35,9 @@ function ProfilePage() {
   return (
     <>
       {userInfoProfileStatus === "loading" ? (
-        <p>Loading...</p>
+        <GlobalLoader />
       ) : userInfoProfileStatus === "failed" ? (
-        <p>Error</p>
+        <ServerErrorPage />
       ) : userInfoProfileStatus === "succeeded" ? (
         <Card className="w-full md:w-[350px]">
           <CardHeader>
@@ -57,11 +57,6 @@ function ProfilePage() {
             <p>{userInfoProfile.email}</p>
           </CardContent>
           <CardFooter className="flex flex-col justify-center items-center space-y-4">
-            <div className="p-2 md:p-4 border rounded-lg flex flex-col justify-center items-center ">
-              <p>Total Reviews</p>
-              <Separator />
-              <p>{userInfoProfile.totalReviews}</p>
-            </div>
             <Button
               variant="secondary"
               size="sm"

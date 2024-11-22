@@ -21,6 +21,7 @@ function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const userDetails = useSelector((state: RootState) => state.user.userDetails);
   const userData = userDetails?.data || {};
 
@@ -38,8 +39,8 @@ function Header() {
     });
   };
   return (
-    <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background/50 shadow  ">
-      <nav className="hidden md:flex justify-between space-x-2">
+    <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background/50">
+      <nav className="flex justify-between space-x-2">
         <div className="w-full flex justify-between">
           <Link to="/">
             <img src={Logo} alt="logo" className="w-10 h-10" />
@@ -48,51 +49,53 @@ function Header() {
             <NavLink to="/create">
               {({ isActive }) => (
                 <p
-                  className={`${
+                  className={`text-sm md:text-base ${
                     isActive
                       ? "text-foreground underline"
                       : "text-muted-foreground/80"
-                  } hover:underline hover;text-muted-foreground font-semibold`}
+                  } hover:underline hover:text-muted-foreground font-semibold`}
                 >
                   Create Book
                 </p>
               )}
             </NavLink>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Avatar>
-                  <AvatarImage src="" />
-                  <AvatarFallback>
-                    {userData.name ? userData.name[0] : "A"}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => navigate(`/profile/${userData._id}`)}
-                  className="cursor-pointer"
-                >
-                  <User2 />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigate(`/profile/update`)}
-                  className="cursor-pointer"
-                >
-                  <Settings />
-                  Update
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="cursor-pointer"
-                >
-                  <LogOut />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {userInfo && (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarImage src="" />
+                    <AvatarFallback>
+                      {userData.name ? userData.name[0] : "A"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/profile/${userData._id}`)}
+                    className="cursor-pointer"
+                  >
+                    <User2 />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/profile/update`)}
+                    className="cursor-pointer"
+                  >
+                    <Settings />
+                    Update
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer"
+                  >
+                    <LogOut />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <ModeToggle />
           </div>
         </div>
