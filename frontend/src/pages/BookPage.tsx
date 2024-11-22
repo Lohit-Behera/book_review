@@ -30,6 +30,7 @@ function BookPage() {
   const reviews = useSelector(
     (state: RootState) => state.review.getReviews
   ).data;
+  const reviewList = reviews.docs || [];
 
   useEffect(() => {
     if (bookId) {
@@ -107,11 +108,11 @@ function BookPage() {
             </Button>
           </div>
         </div>
-        {reviews.docs.length === 0 ? (
+        {reviewList.length === 0 ? (
           <p className="text-sm md:text-base">No reviews yet</p>
         ) : reviews.docs.length > 0 ? (
           <>
-            {reviews.docs.map((review) => (
+            {reviewList.map((review) => (
               <div className="grid gap-2 p-2 md:p-4 border rounded-md">
                 <p className="text-sm md:text-base">{review.review}</p>
                 <RatingStar value={review.rating} reviews={5} text />

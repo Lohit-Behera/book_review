@@ -1,7 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
 import { User } from "../models/userModel";
+import { Review } from "../models/reviewModel";
 import { Response } from "express";
+import mongoose from "mongoose";
 
 function validateEmail(email: string): boolean {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -214,4 +216,117 @@ const userDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User found successfully."));
 });
 
-export { userRegister, userLogin, userLogout, userDetails };
+const getUserInfo = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const user = await Review.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $group: {
+        _id: "$user",
+        totalReviews: { $sum: 1 },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $unwind: "$userDetails",
+    },
+    {
+      $project: {
+        _id: 0,
+        userId: "$_id",
+        name: "$userDetails.name",
+        email: "$userDetails.email",
+        isAdmin: "$userDetails.isAdmin",
+        totalReviews: 1,
+      },
+    },
+  ]);
+
+  if (!user) {
+    return res.status(404).json(new ApiResponse(404, null, "User not found."));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user[0], "User found successfully."));
+});
+
+const userUpdate = asyncHandler(async (req, res) => {
+  // get data from req.body
+  const { name, email } = req.body;
+
+  const user = await User.findById(req.user?._id);
+
+  // validate data
+  if (!name || !email) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Please provide all required fields."));
+  }
+  if (user?.name !== name && user) {
+    user.name = name;
+    await user.save({ validateBeforeSave: false });
+  }
+  if (user?.email !== email && user) {
+    user.email = email;
+    await user.save({ validateBeforeSave: false });
+  }
+
+  // send response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "User updated successfully."));
+});
+
+const updatePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Please provide all required fields."));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Passwords do not match."));
+  }
+
+  const user = await User.findById(req.user?._id);
+  if (user) {
+    if (!(await user?.comparePassword(oldPassword))) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Old password is incorrect."));
+    } else {
+      user.password = newPassword;
+      await user.save({ validateBeforeSave: false });
+
+      return res
+        .status(200)
+        .json(new ApiResponse(200, null, "Password updated successfully."));
+    }
+  }
+});
+
+export {
+  userRegister,
+  userLogin,
+  userLogout,
+  userDetails,
+  getUserInfo,
+  userUpdate,
+  updatePassword,
+};

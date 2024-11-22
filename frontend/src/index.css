@@ -72,7 +72,7 @@
 :-webkit-autofill:hover,
 :-webkit-autofill:focus {
   border: 1px solid #f4f4f5;
-  -webkit-text-fill-color:black; 
+  -webkit-text-fill-color: black;
   -webkit-box-shadow: 0 0 0px 1000px #f4f4f5 inset;
   transition: background-color 5000s ease-in-out 0s;
 }
@@ -80,8 +80,8 @@
 .dark :-webkit-autofill,
 .dark :-webkit-autofill:hover,
 .dark :-webkit-autofill:focus {
-  border: 1px solid #262626;
+  border: 1px solid #192230;
   -webkit-text-fill-color: white;
-  -webkit-box-shadow: 0 0 0px 1000px #262626 inset;
+  -webkit-box-shadow: 0 0 0px 1000px #192230 inset;
   transition: background-color 5000s ease-in-out 0s;
 }

@@ -34,7 +34,7 @@ function HomePage() {
             <Card>
               <CardHeader>
                 <Link to={`/book/${book?._id}`}>
-                  <CardTitle className="text-lg md:text-xl hover:underline">
+                  <CardTitle className="text-lg md:text-xl line-clamp-1 hover:underline">
                     {book?.title}
                   </CardTitle>
                 </Link>

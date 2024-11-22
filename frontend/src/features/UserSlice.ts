@@ -12,6 +12,14 @@ type UserDetails = {
   updatedAt: Date;
 };
 
+type UserInfoProfile = {
+  totalReviews: number;
+  userId: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+};
+
 export const fetchRegister = createAsyncThunk(
   "user/register",
   async (
@@ -128,6 +136,86 @@ export const fetchUserDetails = createAsyncThunk(
   }
 );
 
+export const fetchUserInfoProfile = createAsyncThunk(
+  "user/userInfoProfile",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/users/profile/${userId}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchUpdateProfile = createAsyncThunk(
+  "user/updateProfile",
+  async (user: { name: string; email: string }, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.put(
+        `${baseUrl}/api/v1/users/update`,
+        user,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchUpdatePassword = createAsyncThunk(
+  "user/updatePassword",
+  async (
+    user: { oldPassword: string; newPassword: string; confirmPassword: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/users/update/password`,
+        user,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const userInfoCookie = getCookie("userInfoBookReview");
 
 const userSlice = createSlice({
@@ -144,6 +232,10 @@ const userSlice = createSlice({
     userDetails: { data: {} as UserDetails },
     userDetailsStatus: "idle",
     userDetailsError: {},
+
+    userInfoProfile: { data: {} as UserInfoProfile },
+    userInfoProfileStatus: "idle",
+    userInfoProfileError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -186,6 +278,20 @@ const userSlice = createSlice({
       .addCase(fetchUserDetails.rejected, (state, action) => {
         state.userDetailsStatus = "failed";
         state.userDetailsError = action.payload || "User Details failed";
+      })
+
+      // User Info Profile
+      .addCase(fetchUserInfoProfile.pending, (state) => {
+        state.userInfoProfileStatus = "loading";
+      })
+      .addCase(fetchUserInfoProfile.fulfilled, (state, action) => {
+        state.userInfoProfileStatus = "succeeded";
+        state.userInfoProfile = action.payload;
+      })
+      .addCase(fetchUserInfoProfile.rejected, (state, action) => {
+        state.userInfoProfileStatus = "failed";
+        state.userInfoProfileError =
+          action.payload || "User Info Profile failed";
       });
   },
 });

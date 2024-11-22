@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LogOut, Settings, User2 } from "lucide-react";
 
 function Header() {
   const dispatch = useDispatch<AppDispatch>();
@@ -69,9 +70,25 @@ function Header() {
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem
+                  onClick={() => navigate(`/profile/${userData._id}`)}
+                  className="cursor-pointer"
+                >
+                  <User2 />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate(`/profile/update`)}
+                  className="cursor-pointer"
+                >
+                  <Settings />
+                  Update
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer"
+                >
+                  <LogOut />
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>

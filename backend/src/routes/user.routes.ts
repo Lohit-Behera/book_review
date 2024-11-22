@@ -5,6 +5,9 @@ import {
   userLogin,
   userLogout,
   userDetails,
+  getUserInfo,
+  userUpdate,
+  updatePassword,
 } from "../controllers/userController";
 
 const router = Router();
@@ -16,5 +19,8 @@ router.post("/login", userLogin);
 // Protected routes
 router.get("/logout", authMiddleware, userLogout);
 router.get("/details", authMiddleware, userDetails);
+router.get("/profile/:userId", authMiddleware, getUserInfo);
+router.patch("/update", authMiddleware, userUpdate);
+router.patch("/update/password", authMiddleware, updatePassword);
 
 export default router;

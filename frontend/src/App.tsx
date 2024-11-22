@@ -17,7 +17,9 @@ import LoginPage from "@/pages/LoginPage";
 import CreateBookPage from "@/pages/CreateBookPage";
 import BookPage from "./pages/BookPage";
 import ProfilePage from "./pages/ProfilePage";
+import ProfileUpdatePage from "./pages/ProfileUpdatePage";
 
+// TODO feature books
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
@@ -46,6 +48,14 @@ const router = createBrowserRouter(
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile/update"
+        element={
+          <ProtectedRoute>
+            <ProfileUpdatePage />
           </ProtectedRoute>
         }
       />
