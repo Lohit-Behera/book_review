@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --legacy-watch src/index.ts"
+    "start": "node src/index.ts",
+    "dev": "nodemon -r dotenv/config --legacy-watch src/index.ts",
+    "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../frontend && npm run build && @powershell Copy-Item -Recurse dist ../backend",
+  "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
